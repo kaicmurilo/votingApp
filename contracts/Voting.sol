@@ -16,6 +16,8 @@ contract Voting {
 
     address public owner;
     string public electionName;
+    uint public startTime;
+    uint public endTime;
 
     mapping(address => Voter) public voters;
     Candidate[] public candidates;
@@ -29,9 +31,19 @@ contract Voting {
         _;
     }
 
-    constructor(string memory _name) {
+    modifier duringVoting() {
+        require(
+            block.timestamp >= startTime && block.timestamp <= endTime,
+            unicode"Fora do período de votação."
+        );
+        _;
+    }
+
+    constructor(string memory _name, uint _duration) {
         owner = msg.sender;
         electionName = _name;
+        startTime = block.timestamp;
+        endTime = block.timestamp + _duration;
     }
 
     function addCandidate(string memory _name) public ownerOnly {
@@ -46,7 +58,7 @@ contract Voting {
         voters[_person].authorized = true;
     }
 
-    function vote(uint _candidateId) public {
+    function vote(uint _candidateId) public duringVoting {
         Voter storage sender = voters[msg.sender];
         require(!sender.voted, unicode"Você já votou.");
         require(sender.authorized, unicode"Você não está autorizado a votar.");
@@ -60,6 +72,6 @@ contract Voting {
     }
 
     function end() public ownerOnly {
-        // Implementar lógica para encerrar a eleição, se necessário
+        // Implementar lógica para encerrar a eleição
     }
 }

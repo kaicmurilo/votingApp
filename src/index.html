@@ -1,14 +1,146 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
   <head>
-    <title>Voting DApp</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voting DApp - Eleição Estudantil</title>
     <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f2f5;
+        margin: 0;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+        font-size: 2.5em;
+        margin-bottom: 20px;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      h2 {
+        color: #444;
+        font-size: 1.5em;
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 5px;
+        margin-bottom: 20px;
+      }
+
+      #status-message {
+        margin-bottom: 15px;
+        color: #ff3b3b;
+        font-weight: bold;
+      }
+
+      #candidate-list {
+        margin-bottom: 30px;
+      }
+
+      .candidate-item {
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 10px;
+        font-size: 1.1em;
+      }
+
+      .form-section {
+        margin-bottom: 40px;
+      }
+
+      input[type="text"],
+      input[type="number"] {
+        width: calc(100% - 100px);
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1em;
+      }
+
+      button {
+        padding: 10px 20px;
+        font-size: 1em;
+        background-color: #007bff;
+        border: none;
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+        margin-left: 10px;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      .form-group {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+
+      footer {
+        text-align: center;
+        margin-top: 30px;
+        font-size: 0.9em;
+        color: #888;
+      }
+    </style>
   </head>
   <body>
     <h1>Eleição Estudantil</h1>
-    <div id="candidate-list"></div>
-    <input type="number" id="candidate-id" placeholder="ID do Candidato" />
-    <button onclick="vote()">Votar</button>
+    <div class="container">
+      <!-- Mensagem de status -->
+      <div id="status-message"></div>
+
+      <!-- Lista de candidatos -->
+      <div id="candidate-list">
+        <h2>Lista de Candidatos</h2>
+        <!-- Os candidatos serão listados aqui -->
+      </div>
+
+      <!-- Formulário para adicionar candidatos -->
+      <div id="add-candidate-section" style="display: none">
+        <h2>Adicionar Candidato</h2>
+        <input
+          type="text"
+          id="candidate-name"
+          placeholder="Nome do Candidato"
+        />
+        <button onclick="addCandidate()">Adicionar Candidato</button>
+      </div>
+
+      <!-- Campo para votar -->
+      <div class="form-section">
+        <h2>Votar</h2>
+        <div class="form-group">
+          <input
+            type="number"
+            id="candidate-id"
+            placeholder="ID do Candidato"
+          />
+          <button onclick="vote()">Votar</button>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Desenvolvido com 💙 para melhorar a experiência de votação online.
+    </footer>
+
     <script src="app.js"></script>
   </body>
 </html>

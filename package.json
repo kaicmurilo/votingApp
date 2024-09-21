@@ -1,0 +1,22 @@
+{
+  "scripts": {
+    "compile": "truffle compile",
+    "migrate": "truffle migrate --reset --network development",
+    "copy-contracts": "copyfiles -u 1 \"build/contracts/*.json\" src/",
+    "ganache": "ganache-cli -p 8545",
+    "start-frontend": "live-server src/ --port=8080",
+    "wait-on-ganache": "wait-on tcp:8545",
+    "clean": "rimraf build/ src/*.json",
+    "start-dev": "npm-run-all clean wait-on-ganache compile migrate copy-contracts start-frontend",
+    "start": "npm-run-all -p ganache start-dev"
+  },
+  "devDependencies": {
+    "copyfiles": "^2.4.1",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^3.0.2",
+    "wait-on": "^6.0.1"
+  },
+  "dependencies": {
+    "web3": "^1.5.2"
+  }
+}
