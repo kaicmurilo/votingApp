@@ -23,6 +23,11 @@ contract Voting {
     Candidate[] public candidates;
     uint public totalVotes;
 
+    event Voted(address voter, uint candidateId);
+    event CandidateAdded(string name);
+    event Authorized(address voter);
+    event VotingFailed(address voter, string reason);
+
     modifier ownerOnly() {
         require(
             msg.sender == owner,
@@ -60,15 +65,22 @@ contract Voting {
 
     function vote(uint _candidateId) public duringVoting {
         Voter storage sender = voters[msg.sender];
-        require(!sender.voted, unicode"Você já votou.");
-        require(sender.authorized, unicode"Você não está autorizado a votar.");
-        require(_candidateId < candidates.length, unicode"Candidato inválido.");
+        if (sender.voted) {
+            emit VotingFailed(msg.sender, unicode"Você já votou.");
+            revert(unicode"Você já votou.");
+        }
+        if (_candidateId >= candidates.length) {
+            emit VotingFailed(msg.sender, unicode"Candidato inválido.");
+            revert(unicode"Candidato inválido.");
+        }
 
         sender.voted = true;
         sender.vote = _candidateId;
 
         candidates[_candidateId].voteCount += 1;
         totalVotes += 1;
+
+        emit Voted(msg.sender, _candidateId);
     }
 
     function end() public ownerOnly {

@@ -102,9 +102,8 @@ async function addCandidate() {
       .addCandidate(candidateName)
       .send({
         from: currentAccount,
-        gasPrice: gasPrice,
-        gas: gasEstimate,
-        type: "0x0",
+        gasPrice: gasPrice.toString(), // Certifique-se de que está como string
+        gas: gasEstimate.toString(), // Certifique-se de que está como string
       })
       .on("transactionHash", function (hash) {
         statusMessage.innerText =
@@ -125,69 +124,80 @@ async function addCandidate() {
     showErrorModal(`Erro ao adicionar candidato: ${error}`);
   }
 }
+
 async function vote() {
   const candidateId = document.getElementById("candidate-id").value;
 
-  if (candidateId === "") {
-    showErrorModal("Por favor, insira o ID do candidato.");
+  if (candidateId === "" || isNaN(candidateId)) {
+    showErrorModal("Por favor, insira um ID de candidato válido.");
     return;
   }
 
   try {
     const statusMessage = document.getElementById("status-message");
+
     const gasPrice = await web3.eth.getGasPrice();
 
-    // Tentar estimar o gás e capturar erros
-    let gasEstimate;
-    try {
-      gasEstimate = await votingContract.methods
-        .vote(candidateId)
-        .estimateGas({ from: currentAccount });
-    } catch (error) {
-      console.error("Erro ao estimar o gás:", error);
-
-      // Verificar se há informações detalhadas no objeto de erro
-      if (error && error.data) {
-        const errorData = error.data;
-        const errorMessage = errorData.message || JSON.stringify(errorData);
-        showErrorModal(`Erro ao estimar o gás: ${errorMessage}`);
-      } else if (error && error.message) {
-        showErrorModal(`Erro ao estimar o gás: ${error.message}`);
-      } else {
-        showErrorModal(
-          "Erro ao estimar o gás. Verifique o console para mais detalhes."
-        );
-      }
+    if (!gasPrice || isNaN(Number(gasPrice))) {
+      showErrorModal("Erro ao obter o preço do gás.");
       return;
     }
+
+    let gasEstimate;
+    // try {
+    //   console.log("Candidato válido:", candidateId);
+
+    //   const balance = await web3.eth.getBalance(currentAccount);
+    //   console.log("Saldo da conta:", balance);
+    //   if (balance === "0") {
+    //     showErrorModal("Saldo insuficiente.");
+    //     return;
+    //   }
+
+    //   gasEstimate = await votingContract.methods.vote(candidateId).estimateGas({
+    //     from: currentAccount,
+    //   });
+    // } catch (error) {
+    //   console.error("Erro ao estimar o gás:", error);
+    //   showErrorModal("Erro ao estimar o gás. Detalhes no console.");
+    //   return;
+    // }
+
+    // if (!gasEstimate || isNaN(Number(gasEstimate))) {
+    //   showErrorModal("Erro ao estimar o gás.");
+    //   return;
+    // }
+
+    const adjustedGasLimit = Math.floor(gasEstimate * 1.2); // Aumentar em 20%
 
     // Informar ao usuário que a transação está sendo enviada
     statusMessage.innerText = "Aguardando confirmação no MetaMask...";
 
-    // Enviar a transação
+    console.log("Candidato selecionado:", candidateId);
+
     votingContract.methods
       .vote(candidateId)
       .send({
         from: currentAccount,
-        gasPrice: gasPrice,
-        gas: gasEstimate,
-        type: "0x0",
+        gasPrice: "2000000000", // Certifique-se de que está como string
+        gas: "500000", // Certifique-se de que está como string
       })
       .on("transactionHash", function (hash) {
-        console.log("Transaction hash:", hash);
         statusMessage.innerText =
           "Transação enviada. Aguardando confirmação...";
       })
       .on("receipt", function (receipt) {
-        console.log("Voto computado com sucesso:", receipt);
-        statusMessage.innerText = "";
-        showErrorModal("Voto computado com sucesso!");
+        statusMessage.innerText = "Voto computado com sucesso!";
         displayCandidates();
       })
       .on("error", function (error) {
         console.error("Erro ao votar:", error);
         statusMessage.innerText = "";
-        if (error && error.message) {
+        // Captura a mensagem de erro revertida pelo contrato
+        if (error && error.message.includes("revert")) {
+          // A razão de "Você já votou" deve estar na mensagem de erro
+          showErrorModal(`Erro ao votar: ${parseRevertReason(error.message)}`);
+        } else if (error && error.message) {
           showErrorModal(`Erro ao votar: ${error.message}`);
         } else {
           showErrorModal(
@@ -197,5 +207,11 @@ async function vote() {
       });
   } catch (error) {
     showErrorModal(`Erro ao votar: ${error}`);
+    console.log("Erro ao votar:", error.message);
   }
+}
+
+function parseRevertReason(errorMessage) {
+  const revertMessage = errorMessage.match(/revert (.*)/);
+  return revertMessage ? revertMessage[1] : "Erro desconhecido";
 }
