@@ -3,7 +3,7 @@ module.exports = {
     development: {
       host: "127.0.0.1", // Endereço local
       port: 8545, // Porta padrão do ganache-cli
-      network_id: "*", // Qualquer rede (padrão)
+      network_id: "1337", // Qualquer rede (padrão)
     },
   },
   compilers: {

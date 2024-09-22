@@ -3,12 +3,13 @@
     "compile": "truffle compile",
     "migrate": "truffle migrate --reset --network development",
     "copy-contracts": "copyfiles -u 1 \"build/contracts/*.json\" src/",
-    "ganache": "ganache-cli -p 8545",
+    "ganache": "ganache-cli -p 8545 -i 1337 --mnemonic 'vacuum bean armed collect broken sleep marine shaft buffalo left enact sign'",
     "start-frontend": "live-server src/ --port=8080",
     "wait-on-ganache": "wait-on tcp:8545",
-    "clean": "rimraf build/ src/*.json",
+    "clean": "rimraf build/ src/contracts/*.json",
     "start-dev": "npm-run-all clean wait-on-ganache compile migrate copy-contracts start-frontend",
-    "start": "npm-run-all -p ganache start-dev"
+    "build": "npm-run-all clean compile migrate copy-contracts",
+    "start": "npm-run-all -p start-frontend"
   },
   "devDependencies": {
     "copyfiles": "^2.4.1",

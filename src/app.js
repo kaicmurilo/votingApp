@@ -24,6 +24,8 @@ async function initContract() {
     const networkId = await web3.eth.net.getId();
     const networkData = contractData.networks[networkId];
 
+    console.log("networkData", networkId);
+
     if (networkData) {
       const contractAddress = networkData.address;
 
