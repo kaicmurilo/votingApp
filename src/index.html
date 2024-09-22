@@ -98,6 +98,65 @@
         font-size: 0.9em;
         color: #888;
       }
+
+      /* Estilo do modal */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+
+      .modal-content {
+        background-color: #fff;
+        margin: 15% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 400px;
+        border-radius: 8px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+        text-align: center;
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: #000;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .modal-error {
+        color: #ff3b3b;
+        font-size: 1.2em;
+        margin-bottom: 15px;
+      }
+
+      .modal button {
+        background-color: #007bff;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      .modal button:hover {
+        background-color: #0056b3;
+      }
     </style>
   </head>
   <body>
@@ -141,6 +200,38 @@
       Desenvolvido com 💙 para melhorar a experiência de votação online.
     </footer>
 
+    <!-- Modal de Erro -->
+    <div id="errorModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <p class="modal-error" id="errorMessage">Erro</p>
+        <button onclick="closeModal()">Fechar</button>
+      </div>
+    </div>
+
     <script src="app.js"></script>
+
+    <script>
+      // Função para abrir o modal de erro
+      function showErrorModal(errorMessage) {
+        const modal = document.getElementById("errorModal");
+        const message = document.getElementById("errorMessage");
+        message.innerText = errorMessage;
+        modal.style.display = "block";
+      }
+
+      // Função para fechar o modal de erro
+      function closeModal() {
+        document.getElementById("errorModal").style.display = "none";
+      }
+
+      // Fechar o modal se o usuário clicar fora do conteúdo
+      window.onclick = function (event) {
+        const modal = document.getElementById("errorModal");
+        if (event.target === modal) {
+          modal.style.display = "none";
+        }
+      };
+    </script>
   </body>
 </html>

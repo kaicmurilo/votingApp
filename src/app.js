@@ -9,7 +9,7 @@ window.addEventListener("load", async () => {
     await ethereum.request({ method: "eth_requestAccounts" });
     await initContract();
   } else {
-    alert("Por favor, instale o Metamask para usar esta DApp.");
+    showErrorModal("Por favor, instale o Metamask para usar esta DApp.");
   }
 });
 
@@ -46,18 +46,15 @@ async function initContract() {
           addCandidateSection.style.display = "none";
         }
       } else {
-        console.error('Elemento "add-candidate-section" não encontrado.');
+        showErrorModal("Elemento de adicionar candidatos não encontrado.");
       }
 
       displayCandidates();
     } else {
-      alert("O contrato não está implantado na rede atual.");
+      showErrorModal("O contrato não está implantado na rede atual.");
     }
   } catch (error) {
-    console.error("Erro ao inicializar o contrato:", error);
-    alert(
-      "Erro ao inicializar o contrato. Verifique o console para mais detalhes."
-    );
+    showErrorModal(`Erro ao inicializar o contrato: ${error}`);
   }
 }
 
@@ -74,16 +71,16 @@ async function displayCandidates() {
 
 async function addCandidate() {
   if (currentAccount.toLowerCase() !== ownerAddress.toLowerCase()) {
-    alert("Apenas o proprietário do contrato pode adicionar candidatos.");
+    showErrorModal(
+      "Apenas o proprietário do contrato pode adicionar candidatos."
+    );
     return;
   }
 
   const candidateName = document.getElementById("candidate-name").value;
 
-  console.log("candidateName", candidateName);
-
   if (!candidateName) {
-    alert("Por favor, insira o nome do candidato.");
+    showErrorModal("Por favor, insira o nome do candidato.");
     return;
   }
 
@@ -91,7 +88,6 @@ async function addCandidate() {
     const statusMessage = document.getElementById("status-message");
 
     const gasPrice = await web3.eth.getGasPrice();
-    console.log("gasPrice", gasPrice);
     const gasEstimate = await votingContract.methods
       .addCandidate(candidateName)
       .estimateGas({ from: currentAccount });
@@ -109,32 +105,29 @@ async function addCandidate() {
         type: "0x0",
       })
       .on("transactionHash", function (hash) {
-        console.log("Transaction hash:", hash);
         statusMessage.innerText =
           "Transação enviada. Aguardando confirmação...";
       })
       .on("receipt", function (receipt) {
-        console.log("Transação bem-sucedida:", receipt);
         statusMessage.innerText = "";
-        alert(`Candidato "${candidateName}" adicionado com sucesso!`);
+        showErrorModal(`Candidato "${candidateName}" adicionado com sucesso!`);
         displayCandidates();
         document.getElementById("candidate-name").value = "";
       })
       .on("error", function (error) {
         console.error("Detalhes do erro:", error);
         statusMessage.innerText = "";
-        alert(`Erro ao adicionar candidato: ${error.message}`);
+        showErrorModal(`Erro ao adicionar candidato: ${error.message}`);
       });
   } catch (error) {
-    alert(`Erro ao adicionar candidato: ${error.message}`);
-    console.error("Detalhes do erro:", error);
+    showErrorModal(`Erro ao adicionar candidato: ${error}`);
   }
 }
 async function vote() {
   const candidateId = document.getElementById("candidate-id").value;
 
   if (candidateId === "") {
-    alert("Por favor, insira o ID do candidato.");
+    showErrorModal("Por favor, insira o ID do candidato.");
     return;
   }
 
@@ -155,11 +148,13 @@ async function vote() {
       if (error && error.data) {
         const errorData = error.data;
         const errorMessage = errorData.message || JSON.stringify(errorData);
-        alert(`Erro ao estimar o gás: ${errorMessage}`);
+        showErrorModal(`Erro ao estimar o gás: ${errorMessage}`);
       } else if (error && error.message) {
-        alert(`Erro ao estimar o gás: ${error.message}`);
+        showErrorModal(`Erro ao estimar o gás: ${error.message}`);
       } else {
-        alert("Erro ao estimar o gás. Verifique o console para mais detalhes.");
+        showErrorModal(
+          "Erro ao estimar o gás. Verifique o console para mais detalhes."
+        );
       }
       return;
     }
@@ -184,20 +179,21 @@ async function vote() {
       .on("receipt", function (receipt) {
         console.log("Voto computado com sucesso:", receipt);
         statusMessage.innerText = "";
-        alert("Voto computado com sucesso!");
+        showErrorModal("Voto computado com sucesso!");
         displayCandidates();
       })
       .on("error", function (error) {
         console.error("Erro ao votar:", error);
         statusMessage.innerText = "";
         if (error && error.message) {
-          alert(`Erro ao votar: ${error.message}`);
+          showErrorModal(`Erro ao votar: ${error.message}`);
         } else {
-          alert("Erro ao votar. Verifique o console para mais detalhes.");
+          showErrorModal(
+            "Erro ao votar. Verifique o console para mais detalhes."
+          );
         }
       });
   } catch (error) {
-    alert(`Erro ao votar: ${error.message}`);
-    console.error("Erro ao votar:", error);
+    showErrorModal(`Erro ao votar: ${error}`);
   }
 }
